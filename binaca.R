@@ -125,22 +125,162 @@ tuber_GET
 #Rcurl method
 library(RCurl)
 #query to get video id
-curlPerform(url="https://www.googleapis.com/youtube/v3/search?part=id&q=ukraine&maxResults=1&type=video&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
-# return stats from video id
-curlPerform(url="https://www.googleapis.com/youtube/v3/videos?part=statistics&id=cvorg5tCmlQ&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")# Earlier i missed a query after part?
-# or from json like this
-a = curlPerform(url="https://www.googleapis.com/youtube/v3/search?part=id&q=ukraine&maxResults=1&type=video&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
-library(jsonlite)
-b = fromJSON("https://www.googleapis.com/youtube/v3/search?part=id&q=ukraine&maxResults=1&type=video&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
+#Make G vector amenable for query
+songvec = gsub("","+",G)
+songvec[1]
+
+library(stringr)
+#  http://stackoverflow.com/questions/13985215/replace-special-characters-along-with-the-space-in-list-of-strings)
+song = gsub('([[:punct:]])|\\s+','+',G)
+str(song)
+song[2]
+
+length(song)
+
+
+for(i in length(song))
+{print(song[i])}
+
+for ( i in length(song) )
+{
+target4 = paste0("https://www.googleapis.com/youtube/v3/search?part=id&q=",song,"&maxResults=1&type=video&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
+
+
+}
+#http://stackoverflow.com/questions/37576798/r-jsonlite-loop-issue
+
+
+doc = lapply(target4,fromJSON)
+
+b = fromJSON(target1)
 b$items
 C = b$items$id
 D = C$videoId
 
+doc2 = unlist(doc)
+str(doc2)
+jsonlist = function (x)
+{
+ 
+  a1 = fromJSON(x)
+  
+  a2 = a1$items$id
+  a2 = a2$videoId
+  
+}
+
+song2id = function(x){
+target5 = paste0("https://www.googleapis.com/youtube/v3/search?part=id&q=",x,"&maxResults=1&type=video&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
+g1 = fromJSON(target5)
+
+g2 = g1$items$id
+g3 = g2$videoId
+
+}
+
+id2stats = function {
+target6 = paste0("https://www.googleapis.com/youtube/v3/videos?part=statistics&id=",g3,"&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
+E1 = fromJSON(target6)
+
+# Make a new data frame
+E2 = E$items
+# Drop few columns
+
+E2 = within(E2, rm(kind, etag))
+
+# Rename rest
+#http://stackoverflow.com/questions/20987295/rename-multiple-columns-by-names
+
+
+
+}
+
+miscell1 = lapply(song, song2id)
+miscell2 = lapply(miscell1,get_stats)
+
+miscell3 = as.data.frame(miscell2)
+
+# converting lists of lists to data frame
+# http://stackoverflow.com/questions/29674661/r-list-of-lists-to-data-frame
+miscell4  <-  as.data.frame(matrix(unlist(miscell2), nrow=length(unlist(miscell2[1]))))
+
+# Now transpose row to columns
+# https://www.r-statistics.com/tag/transpose/
+
+miscell5 = t(miscell4)
+
+colnames(miscell5) = c("views","Likes","Dislikes","Favorites","comments") 
+
+# https://www.google.co.in/search?q=place+a+column+at+first+in+data+frame&ie=utf-8&oe=utf-8&client=firefox-b-ab&gfe_rd=cr&ei=PEHeV_LxPIjT8gey4oqgBw
+miscell1 = unlist(miscell1)
+
+miscell6 = cbind(miscell1,miscell5)
+miscell7 = cbind(total$`Song Heading`,miscell6)
+miscell7 = as.data.frame(miscell7)
+
+row.names(miscell7)
+nrow(miscell7)
+`miscell8 = row.names<-`(miscell7,1:nrow(miscell7))) # doesnt work
+
+#http://stackoverflow.com/questions/18803354/ending-prompt-in-r
+
+miscell8 = as.data.frame(miscell7,row.names = 1:nrow(miscell7))
+
+# renmaing again
+#http://stackoverflow.com/questions/6081439/changing-column-names-of-a-data-frame-in-r
+names(data)[names(data) == "oldVariableName"] <- "newVariableName"
+library(dplyr)
+miscell8 = rename(miscell8, Songheading = V1, ID = miscell1)
+
+# miscell8 has old song headings replace with H
+miscell8$Songheading<- H # Total rplaces
+
+names(iris)
+
+
+
+str(miscell4)
+
+
+str(mis1)
+
+
+
+
+
+hrh =jsonlist(target4[1])
+hrh
+
+
 target = paste0("https://www.googleapis.com/youtube/v3/videos?part=statistics&id=",D,"&key=AIzaSyCppcUGi2VqhT8hVMkAgaw10KXXmGj6k64")
 target
-rd <- readLines(target, warn="F") 
-fromJSON(target)
+
+E = fromJSON(target)
 fromJSON(rd)
+# Make a new data frame
+F = E$items
+# Drop few columns
+
+F = within(F, rm(kind, etag))
+
+# Rename rest
+#http://stackoverflow.com/questions/20987295/rename-multiple-columns-by-names
+str(F)
+F1 = F$id
+F2 = F$statistics
+#F2
+#str(F2)
+F2$id = F1
+F2
+# reorder column names
+#http://stackoverflow.com/questions/5620885/how-does-one-reorder-columns-in-a-data-frame
+F2 <- F2[c(6,1,2,3,4,5)]
+colnames(F2) = c("id","views","Likes","Dislikes","Favorites","comments") 
+F2[i]
+
+}
+
+
 
 
 
